@@ -5,6 +5,7 @@ import br.com.allen.dto.ProposalDTO;
 import br.com.allen.dto.QuotationDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @ApplicationScoped
@@ -15,4 +16,6 @@ public interface OpportunityService {
     void saveQuotation(QuotationDTO quotation);
 
     List<OpportunityDTO> generateOpportunityData();
+
+    ByteArrayInputStream generateCSVOpportunityReport();
 }
