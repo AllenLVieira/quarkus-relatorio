@@ -8,15 +8,17 @@ import br.com.allen.entity.QuotationEntity;
 import br.com.allen.repository.OpportunityRepository;
 import br.com.allen.repository.QuotationRepository;
 import br.com.allen.utils.CSVUtils;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@ApplicationScoped
 public class OpportunityServiceImpl implements OpportunityService {
     @Inject
     QuotationRepository quotationRepository;
@@ -32,8 +34,12 @@ public class OpportunityServiceImpl implements OpportunityService {
     }
 
     @Override
+    @Transactional
     public void saveQuotation(QuotationDTO quotation) {
-
+        QuotationEntity createQuotation = new QuotationEntity();
+        createQuotation.setDate(new Date());
+        createQuotation.setCurrencyPrice(quotation.getCurrencyPrice());
+        quotationRepository.persist(createQuotation);
     }
 
     @Override
