@@ -12,6 +12,8 @@ import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.List;
 @Path("/api/opportunity")
 @Authenticated
 public class OpportunityController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpportunityController.class);
+
 
     @Inject
     OpportunityService opportunityService;
@@ -31,13 +36,14 @@ public class OpportunityController {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response generateReport() {
         try {
-            return Response
-                    .ok(opportunityService.generateCSVOpportunityReport(),
+            LOGGER.info("Recebida solicitação de geração de relatório.");
+            Response.ResponseBuilder responseBuilder = Response.ok(opportunityService.generateCSVOpportunityReport(),
                             MediaType.APPLICATION_OCTET_STREAM)
-                    .header("content-disposition", "attachment; filename = "
-                            + new Date() + "--oportunidade.csv")
-                    .build();
+                    .header("content-disposition", "attachment; filename = " + new Date() + "--oportunidade.csv");
+            LOGGER.info("Relatório gerado com sucesso.");
+            return responseBuilder.build();
         } catch (ServerErrorException e) {
+            LOGGER.error("Erro durante a geração do relatório.", e);
             return Response.serverError().build();
         }
     }
@@ -46,6 +52,9 @@ public class OpportunityController {
     @Path("/data")
     @RolesAllowed({"user", "manager"})
     public List<OpportunityDTO> generateReportData() {
-        return opportunityService.generateOpportunityData();
+        LOGGER.info("Recebida solicitação de geração de dados de oportunidade.");
+        List<OpportunityDTO> opportunityData = opportunityService.generateOpportunityData();
+        LOGGER.info("Dados de oportunidade gerados com sucesso.");
+        return opportunityData;
     }
 }

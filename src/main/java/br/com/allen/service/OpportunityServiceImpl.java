@@ -11,6 +11,8 @@ import br.com.allen.utils.CSVUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OpportunityServiceImpl implements OpportunityService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpportunityServiceImpl.class);
+
     @Inject
     QuotationRepository quotationRepository;
     @Inject
@@ -28,23 +33,28 @@ public class OpportunityServiceImpl implements OpportunityService {
 
     @Override
     public void buildOpportunity(ProposalDTO proposal) {
+        LOGGER.info("Iniciando construção de oportunidade.");
         List<QuotationEntity> quotationEntities = quotationRepository.findAll().list();
         Collections.reverse(quotationEntities);
         OpportunityEntity opportunity = createOpportunity(proposal, quotationEntities);
         opportunityRepository.persist(opportunity);
+        LOGGER.info("Oportunidade construída e persistida com sucesso.");
     }
 
     @Override
     @Transactional
     public void saveQuotation(QuotationDTO quotation) {
+        LOGGER.info("Salvando cotação.");
         QuotationEntity createQuotation = new QuotationEntity();
         createQuotation.setDate(new Date());
         createQuotation.setCurrencyPrice(quotation.getCurrencyPrice());
         quotationRepository.persist(createQuotation);
+        LOGGER.info("Cotação salva com sucesso.");
     }
 
     @Override
     public List<OpportunityDTO> generateOpportunityData() {
+        LOGGER.info("Gerando dados de oportunidade.");
         List<OpportunityDTO> opportunities = new ArrayList<>();
 
         opportunityRepository
@@ -56,14 +66,17 @@ public class OpportunityServiceImpl implements OpportunityService {
                         .priceTonne(item.getPriceTonne())
                         .lastDollarQuotation(item.getLastDollarQuotation())
                         .build()));
-
+        LOGGER.info("Dados de oportunidade gerados com sucesso.");
         return opportunities;
     }
 
     @Override
     public ByteArrayInputStream generateCSVOpportunityReport() {
+        LOGGER.info("Gerando relatório de oportunidades em CSV.");
         List<OpportunityDTO> opportunityList = mapOpportunityEntitiesToDTOs(opportunityRepository.findAll().list());
-        return CSVUtils.opportunitiesToCSV(opportunityList);
+        ByteArrayInputStream csvReport = CSVUtils.opportunitiesToCSV(opportunityList);
+        LOGGER.info("Relatório de oportunidades em CSV gerado com sucesso.");
+        return csvReport;
     }
 
     private OpportunityEntity createOpportunity(ProposalDTO proposal, List<QuotationEntity> quotationEntities) {

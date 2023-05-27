@@ -3,7 +3,7 @@ package br.com.allen.messaging;
 import br.com.allen.dto.ProposalDTO;
 import br.com.allen.dto.QuotationDTO;
 import br.com.allen.service.OpportunityService;
-import io.smallrye.reactive.messaging.annotations.Blocking;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
